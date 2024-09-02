@@ -103,7 +103,7 @@
         let userColor = { h: 0, s: 100, l: 50 };
 
         function setTargetColor() {
-            document.getElementById('targetColor').style.backgroundColor = hsl(${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%);
+            document.getElementById('targetColor').style.backgroundColor = `hsl(${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)`;
         }
 
         function newColor() {
@@ -130,7 +130,7 @@
                 ctx.moveTo(radius, radius);
                 ctx.arc(radius, radius, radius, startAngle, endAngle, false);
                 ctx.closePath();
-                ctx.fillStyle = hsl(${angle}, 100%, 50%);
+                ctx.fillStyle = `hsl(${angle}, 100%, 50%)`;
                 ctx.fill();
             }
 
@@ -145,7 +145,7 @@
             userColor.h = document.getElementById('hueSlider').value;
             userColor.s = document.getElementById('saturationSlider').value;
             userColor.l = document.getElementById('lightnessSlider').value;
-            document.getElementById('userColor').style.backgroundColor = hsl(${userColor.h}, ${userColor.s}%, ${userColor.l}%);
+            document.getElementById('userColor').style.backgroundColor = `hsl(${userColor.h}, ${userColor.s}%, ${userColor.l}%)`;
 
             drawColorWheel();
         }
@@ -208,7 +208,7 @@
             if (totalDiff === 0) {
                 resultText = "PERFECT! 눈썰미가 아주 끝내주네요!";
             } else {
-                resultText = 차이값: Hue(${hDiff > 0 ? '+' + hDiff : hDiff}), Saturation(${sDiff > 0 ? '+' + sDiff : sDiff}), Lightness(${lDiff > 0 ? '+' + lDiff : lDiff});
+                resultText = `차이값: Hue(${hDiff > 0 ? '+' + hDiff : hDiff}), Saturation(${sDiff > 0 ? '+' + sDiff : sDiff}), Lightness(${lDiff > 0 ? '+' + lDiff : lDiff})`;
                 if (Math.abs(hDiff) <= 10 && Math.abs(sDiff) <= 10 && Math.abs(lDiff) <= 10) {
                     resultText += " (GOOD! 잘했어요!)";
                 }
@@ -218,7 +218,7 @@
         }
 
         function showAnswer() {
-            let answerText = 주어진 HSL: (${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)\n당신이 고른 HSL: (${userColor.h}, ${userColor.s}%, ${userColor.l}%);
+            let answerText = `주어진 HSL: (${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)\n당신이 고른 HSL: (${userColor.h}, ${userColor.s}%, ${userColor.l}%)`;
             document.getElementById('answerText').innerText = answerText;
         }
 
