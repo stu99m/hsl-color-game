@@ -13,12 +13,11 @@
             display: flex;
             justify-content: center;
             margin: 20px auto;
-            flex-wrap: wrap; /* 화면 크기에 따라 자동으로 요소 배치 */
         }
         #targetColor, #userColor {
-            width: 30vw;  /* 화면 너비의 30% */
-            height: 30vw; /* 화면 너비의 30% */
-            margin: 10px;
+            width: 120px;
+            height: 120px;
+            margin: 0 10px;
             border: 2px solid #000;
         }
         .slider-container {
@@ -26,7 +25,6 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 10px;
-            width: 100%; /* 전체 화면 너비에 맞춤 */
         }
         .slider-label {
             width: 70px;
@@ -34,10 +32,10 @@
             margin-right: 10px;
         }
         .slider {
-            width: 70%; /* 슬라이더가 화면의 70%를 차지 */
+            width: 300px;
         }
         .number-input {
-            width: 20%; /* 숫자 입력 칸이 화면의 20%를 차지 */
+            width: 60px;
             margin-left: 10px;
         }
         .info-text {
@@ -47,8 +45,6 @@
         #colorWheel {
             margin: 20px auto;
             cursor: crosshair;
-            width: 80vw;  /* 화면 너비의 80% */
-            height: 80vw; /* 화면 너비의 80% */
         }
         .button-container {
             margin-top: 20px;
@@ -70,7 +66,7 @@
     
     <p>이 색을 맞춰봐!</p>
 
-    <canvas id="colorWheel"></canvas>
+    <canvas id="colorWheel" width="300" height="300"></canvas>
     <div class="slider-container">
         <label for="hueSlider" class="slider-label">Hue</label>
         <input type="range" id="hueSlider" class="slider" min="0" max="360">
@@ -107,7 +103,7 @@
         let userColor = { h: 0, s: 100, l: 50 };
 
         function setTargetColor() {
-            document.getElementById('targetColor').style.backgroundColor = `hsl(${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)`;
+            document.getElementById('targetColor').style.backgroundColor = hsl(${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%);
         }
 
         function newColor() {
@@ -134,7 +130,7 @@
                 ctx.moveTo(radius, radius);
                 ctx.arc(radius, radius, radius, startAngle, endAngle, false);
                 ctx.closePath();
-                ctx.fillStyle = `hsl(${angle}, 100%, 50%)`;
+                ctx.fillStyle = hsl(${angle}, 100%, 50%);
                 ctx.fill();
             }
 
@@ -149,7 +145,7 @@
             userColor.h = document.getElementById('hueSlider').value;
             userColor.s = document.getElementById('saturationSlider').value;
             userColor.l = document.getElementById('lightnessSlider').value;
-            document.getElementById('userColor').style.backgroundColor = `hsl(${userColor.h}, ${userColor.s}%, ${userColor.l}%)`;
+            document.getElementById('userColor').style.backgroundColor = hsl(${userColor.h}, ${userColor.s}%, ${userColor.l}%);
 
             drawColorWheel();
         }
@@ -212,7 +208,7 @@
             if (totalDiff === 0) {
                 resultText = "PERFECT! 눈썰미가 아주 끝내주네요!";
             } else {
-                resultText = `차이값: Hue(${hDiff > 0 ? '+' + hDiff : hDiff}), Saturation(${sDiff > 0 ? '+' + sDiff : sDiff}), Lightness(${lDiff > 0 ? '+' + lDiff : lDiff})`;
+                resultText = 차이값: Hue(${hDiff > 0 ? '+' + hDiff : hDiff}), Saturation(${sDiff > 0 ? '+' + sDiff : sDiff}), Lightness(${lDiff > 0 ? '+' + lDiff : lDiff});
                 if (Math.abs(hDiff) <= 10 && Math.abs(sDiff) <= 10 && Math.abs(lDiff) <= 10) {
                     resultText += " (GOOD! 잘했어요!)";
                 }
@@ -222,7 +218,7 @@
         }
 
         function showAnswer() {
-            let answerText = `주어진 HSL: (${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)\n당신이 고른 HSL: (${userColor.h}, ${userColor.s}%, ${userColor.l}%)`;
+            let answerText = 주어진 HSL: (${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)\n당신이 고른 HSL: (${userColor.h}, ${userColor.s}%, ${userColor.l}%);
             document.getElementById('answerText').innerText = answerText;
         }
 
