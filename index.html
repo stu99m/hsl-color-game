@@ -194,7 +194,7 @@
             if (totalDiff === 0) {
                 resultText = "PERFECT! 눈썰미가 아주 끝내주네요!";
             } else {
-                resultText = `Difference: Hue(${hDiff > 0 ? '+' + hDiff : hDiff}), Saturation(${sDiff > 0 ? '+' + sDiff : sDiff}), Lightness(${lDiff > 0 ? '+' + lDiff : lDiff})`;
+                resultText = `차이값: Hue(${hDiff > 0 ? '+' + hDiff : hDiff}), Saturation(${sDiff > 0 ? '+' + sDiff : sDiff}), Lightness(${lDiff > 0 ? '+' + lDiff : lDiff})`;
                 if (Math.abs(hDiff) <= 10 && Math.abs(sDiff) <= 10 && Math.abs(lDiff) <= 10) {
                     resultText += " (GOOD! 잘했어요!)";
                 }
