@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HSL 색채 맞추기</title>
+    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSL Color Matching Game with Color Wheel</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -41,20 +40,12 @@
             margin: 20px auto;
             cursor: crosshair;
         }
-        #colorDisplay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            border: 5px solid #fff;
-        }
     </style>
 </head>
 <body>
-    <h1>HSL 색채 맞추기</h1>
+    <h1>HSL Color Matching Game with Color Wheel</h1>
     <div id="targetColor"></div>
-    <p>주어진 색상의 HSL 값을 맞춰보세요!</p>
+    <p>Match this color!</p>
 
     <canvas id="colorWheel" width="300" height="300"></canvas>
     <div class="slider-container">
@@ -109,7 +100,7 @@
                 ctx.fill();
             }
 
-            // 가운데의 큰 원을 제거하고 중심점을 점으로 표현
+            // 가운데의 작은 점을 표현
             ctx.beginPath();
             ctx.arc(radius, radius, 5, 0, Math.PI * 2, false);
             ctx.closePath();
@@ -157,6 +148,7 @@
 
             if (distance <= radius && distance >= 0) {
                 let angle = Math.atan2(dy, dx) * (180 / Math.PI); 
+                angle = (angle + 90) % 360; // 각도를 90도 보정하여 12시 방향을 0도로 설정
                 if (angle < 0) angle += 360; // 각도를 0-360도로 조정
                 userColor.h = Math.round(angle);
                 userColor.s = Math.round((distance / radius) * 100);
