@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSL Color Matching Game with Color Wheel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        #targetColor, #userColor {
+            width: 100px;
+            height: 100px;
+            margin: 10px auto;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .slider-label {
+            width: 50px;
+            text-align: right;
+            margin-right: 10px;
+        }
+        .slider {
+            width: 300px;
+        }
+        .number-input {
+            width: 60px;
+            margin-left: 10px;
+        }
+        .info-text {
+            font-size: 0.9em;
+            color: #666;
+        }
+        #colorWheel {
+            margin: 20px auto;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+    <h1>HSL Color Matching Game with Color Wheel</h1>
+    <div id="targetColor"></div>
+    <p>Match this color!</p>
+    
+    <canvas id="colorWheel" width="300" height="300"></canvas>
+    <div class="slider-container">
+        <label for="lightnessSlider" class="slider-label">Lightness</label>
+        <input type="range" id="lightnessSlider" class="slider" min="0" max="100">
+        <input type="number" id="lightnessNumber" class="number-input" min="0" max="100">
+    </div>
+    <p class="info-text">Saturation과 Lightness는 0-100 범위 내에서 조정할 수 있습니다.</p>
+    
+    <div id="userColor"></div>
+    <p id="resultText"></p>
+    <button onclick="checkColor()">Check Color</button>
+    <button onclick="showAnswer()">Answer Sheet</button>
+    
+    <p id="answerText"></p>
+
+    <script>
+        let targetColor = {
+            h: Math.floor(Math.random() * 361),
+            s: Math.floor(Math.random() * 101),
+            l: Math.floor(Math.random() * 101)
+        };
+
+        let userColor = { h: 0, s: 100, l: 50 };
+
+        document.getElementById('targetColor').style.backgroundColor = `hsl(${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)`;
+
+        function drawColorWheel() {
+            const canvas = document.getElementById('colorWheel');
+            const ctx = canvas.getContext('2d');
+            const radius = canvas.width / 2;
+
+            for (let angle = 0; angle < 360; angle++) {
+                const startAngle = (angle - 90) * Math.PI / 180;
+                const endAngle = (angle - 89) * Math.PI / 180;
+
+                ctx.beginPath();
+                ctx.moveTo(radius, radius);
+                ctx.arc(radius, radius, radius, startAngle, endAngle, false);
+                ctx.closePath();
+                ctx.fillStyle = `hsl(${angle}, 100%, 50%)`;
+                ctx.fill();
+            }
+
+            ctx.beginPath();
+            ctx.arc(radius, radius, radius * 0.5, 0, Math.PI * 2, false);
+            ctx.closePath();
+            ctx.fillStyle = `hsl(${userColor.h}, ${userColor.s}%, 50%)`;
+            ctx.fill();
+        }
+
+        function updateUserColor() {
+            userColor.l = document.getElementById('lightnessSlider').value;
+            document.getElementById('userColor').style.backgroundColor = `hsl(${userColor.h}, ${userColor.s}%, ${userColor.l}%)`;
+        }
+
+        document.getElementById('lightnessSlider').addEventListener('input', function() {
+            document.getElementById('lightnessNumber').value = this.value;
+            updateUserColor();
+        });
+
+        document.getElementById('lightnessNumber').addEventListener('input', function() {
+            document.getElementById('lightnessSlider').value = this.value;
+            updateUserColor();
+        });
+
+        document.getElementById('colorWheel').addEventListener('click', function(event) {
+            const rect = this.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            const radius = this.width / 2;
+            const dx = x - radius;
+            const dy = y - radius;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance <= radius && distance >= radius * 0.5) {
+                const angle = Math.atan2(dy, dx) * (180 / Math.PI) + 180;
+                userColor.h = Math.round(angle);
+                userColor.s = Math.round((distance / radius) * 100);
+
+                updateUserColor();
+                drawColorWheel();
+            }
+        });
+
+        function checkColor() {
+            let hDiff = targetColor.h - userColor.h;
+            let sDiff = targetColor.s - userColor.s;
+            let lDiff = targetColor.l - userColor.l;
+
+            let totalDiff = Math.abs(hDiff) + Math.abs(sDiff) + Math.abs(lDiff);
+
+            let resultText = `Difference: Hue(${hDiff > 0 ? '+' + hDiff : hDiff}), Saturation(${sDiff > 0 ? '+' + sDiff : sDiff}), Lightness(${lDiff > 0 ? '+' + lDiff : lDiff})`;
+
+            if (totalDiff === 0) {
+                resultText = "PERFECT!";
+            } else if (Math.abs(hDiff) <= 10 && Math.abs(sDiff) <= 10 && Math.abs(lDiff) <= 10) {
+                resultText = "GOOD!";
+            }
+            
+            document.getElementById('resultText').innerText = resultText;
+        }
+
+        function showAnswer() {
+            let answerText = `Target HSL: (${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)\nYour HSL: (${userColor.h}, ${userColor.s}%, ${userColor.l}%)`;
+            document.getElementById('answerText').innerText = answerText;
+        }
+
+        drawColorWheel();
+        updateUserColor();
+    </script>
+</body>
+</html>
