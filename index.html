@@ -41,14 +41,34 @@
             margin: 20px auto;
             cursor: crosshair;
         }
+        #colorDisplay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 5px solid #fff;
+        }
     </style>
 </head>
 <body>
     <h1>HSL Color Matching Game with Color Wheel</h1>
     <div id="targetColor"></div>
     <p>Match this color!</p>
-    
+
     <canvas id="colorWheel" width="300" height="300"></canvas>
+    <div class="slider-container">
+        <label for="hueSlider" class="slider-label">Hue</label>
+        <input type="range" id="hueSlider" class="slider" min="0" max="360">
+        <input type="number" id="hueNumber" class="number-input" min="0" max="360">
+    </div>
+    <p class="info-text">Hue는 0-360의 범위 내에서 조정할 수 있습니다.</p>
+    
+    <div class="slider-container">
+        <label for="saturationSlider" class="slider-label">Saturation</label>
+        <input type="range" id="saturationSlider" class="slider" min="0" max="100">
+        <input type="number" id="saturationNumber" class="number-input" min="0" max="100">
+    </div>
     <div class="slider-container">
         <label for="lightnessSlider" class="slider-label">Lightness</label>
         <input type="range" id="lightnessSlider" class="slider" min="0" max="100">
@@ -91,27 +111,41 @@
                 ctx.fill();
             }
 
+            // 가운데의 큰 원을 제거하고 중심점을 점으로 표현
             ctx.beginPath();
-            ctx.arc(radius, radius, radius * 0.5, 0, Math.PI * 2, false);
+            ctx.arc(radius, radius, 5, 0, Math.PI * 2, false);
             ctx.closePath();
-            ctx.fillStyle = `hsl(${userColor.h}, ${userColor.s}%, 50%)`;
+            ctx.fillStyle = "#fff";
             ctx.fill();
         }
 
         function updateUserColor() {
+            userColor.h = document.getElementById('hueSlider').value;
+            userColor.s = document.getElementById('saturationSlider').value;
             userColor.l = document.getElementById('lightnessSlider').value;
             document.getElementById('userColor').style.backgroundColor = `hsl(${userColor.h}, ${userColor.s}%, ${userColor.l}%)`;
+
+            drawColorWheel();
         }
 
-        document.getElementById('lightnessSlider').addEventListener('input', function() {
-            document.getElementById('lightnessNumber').value = this.value;
-            updateUserColor();
-        });
+        function syncSlidersAndNumbers(sliderId, numberId) {
+            let slider = document.getElementById(sliderId);
+            let numberInput = document.getElementById(numberId);
 
-        document.getElementById('lightnessNumber').addEventListener('input', function() {
-            document.getElementById('lightnessSlider').value = this.value;
-            updateUserColor();
-        });
+            slider.addEventListener('input', function() {
+                numberInput.value = slider.value;
+                updateUserColor();
+            });
+
+            numberInput.addEventListener('input', function() {
+                slider.value = numberInput.value;
+                updateUserColor();
+            });
+        }
+
+        syncSlidersAndNumbers('hueSlider', 'hueNumber');
+        syncSlidersAndNumbers('saturationSlider', 'saturationNumber');
+        syncSlidersAndNumbers('lightnessSlider', 'lightnessNumber');
 
         document.getElementById('colorWheel').addEventListener('click', function(event) {
             const rect = this.getBoundingClientRect();
@@ -123,13 +157,20 @@
             const dy = y - radius;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (distance <= radius && distance >= radius * 0.5) {
+            if (distance <= radius && distance >= 0) {
                 const angle = Math.atan2(dy, dx) * (180 / Math.PI) + 180;
+                const saturation = Math.min(Math.max((distance / radius) * 100, 0), 100);
+
                 userColor.h = Math.round(angle);
-                userColor.s = Math.round((distance / radius) * 100);
+                userColor.s = Math.round(saturation);
+
+                document.getElementById('hueSlider').value = userColor.h;
+                document.getElementById('saturationSlider').value = userColor.s;
+
+                document.getElementById('hueNumber').value = userColor.h;
+                document.getElementById('saturationNumber').value = userColor.s;
 
                 updateUserColor();
-                drawColorWheel();
             }
         });
 
