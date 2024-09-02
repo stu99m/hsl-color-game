@@ -101,6 +101,7 @@
         };
 
         let userColor = { h: 0, s: 100, l: 50 };
+        let isDragging = false;
 
         function setTargetColor() {
             document.getElementById('targetColor').style.backgroundColor = `hsl(${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)`;
@@ -165,24 +166,18 @@
             });
         }
 
-        syncSlidersAndNumbers('hueSlider', 'hueNumber');
-        syncSlidersAndNumbers('saturationSlider', 'saturationNumber');
-        syncSlidersAndNumbers('lightnessSlider', 'lightnessNumber');
-
-        document.getElementById('colorWheel').addEventListener('click', function(event) {
-            const rect = this.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
-            const radius = this.width / 2;
-            const dx = x - radius;
-            const dy = y - radius;
+        function updateColorFromWheel(x, y) {
+            const canvas = document.getElementById('colorWheel');
+            const rect = canvas.getBoundingClientRect();
+            const radius = canvas.width / 2;
+            const dx = x - rect.left - radius;
+            const dy = y - rect.top - radius;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
             if (distance <= radius && distance >= 0) {
-                let angle = Math.atan2(dy, dx) * (180 / Math.PI); 
+                let angle = Math.atan2(dy, dx) * (180 / Math.PI);
                 angle = (angle + 90) % 360;
-                if (angle < 0) angle += 360; 
+                if (angle < 0) angle += 360;
                 userColor.h = Math.round(angle);
                 userColor.s = Math.round((distance / radius) * 100);
 
@@ -194,6 +189,48 @@
 
                 updateUserColor();
             }
+        }
+
+        syncSlidersAndNumbers('hueSlider', 'hueNumber');
+        syncSlidersAndNumbers('saturationSlider', 'saturationNumber');
+        syncSlidersAndNumbers('lightnessSlider', 'lightnessNumber');
+
+        const canvas = document.getElementById('colorWheel');
+
+        canvas.addEventListener('mousedown', function(event) {
+            isDragging = true;
+            updateColorFromWheel(event.clientX, event.clientY);
+        });
+
+        canvas.addEventListener('mousemove', function(event) {
+            if (isDragging) {
+                updateColorFromWheel(event.clientX, event.clientY);
+            }
+        });
+
+        canvas.addEventListener('mouseup', function() {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('mouseleave', function() {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('touchstart', function(event) {
+            isDragging = true;
+            const touch = event.touches[0];
+            updateColorFromWheel(touch.clientX, touch.clientY);
+        });
+
+        canvas.addEventListener('touchmove', function(event) {
+            if (isDragging) {
+                const touch = event.touches[0];
+                updateColorFromWheel(touch.clientX, touch.clientY);
+            }
+        });
+
+        canvas.addEventListener('touchend', function() {
+            isDragging = false;
         });
 
         function checkColor() {
