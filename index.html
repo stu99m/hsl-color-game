@@ -15,7 +15,7 @@
             margin: 20px auto;
         }
         #targetColor, #userColor {
-            width: 120px;  /* 조금 더 크게 설정 */
+            width: 120px;
             height: 120px;
             margin: 0 10px;
             border: 2px solid #000;
@@ -87,6 +87,7 @@
     <div class="button-container">
         <button onclick="checkColor()">Check Color</button>
         <button onclick="showAnswer()">Answer Sheet</button>
+        <button onclick="newColor()">New Color</button>
     </div>
     
     <p id="resultText"></p>
@@ -101,7 +102,20 @@
 
         let userColor = { h: 0, s: 100, l: 50 };
 
-        document.getElementById('targetColor').style.backgroundColor = `hsl(${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)`;
+        function setTargetColor() {
+            document.getElementById('targetColor').style.backgroundColor = `hsl(${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)`;
+        }
+
+        function newColor() {
+            targetColor = {
+                h: Math.floor(Math.random() * 361),
+                s: Math.floor(Math.random() * 101),
+                l: Math.floor(Math.random() * 101)
+            };
+            setTargetColor();
+            document.getElementById('resultText').innerText = "";
+            document.getElementById('answerText').innerText = "";
+        }
 
         function drawColorWheel() {
             const canvas = document.getElementById('colorWheel');
@@ -208,6 +222,8 @@
             document.getElementById('answerText').innerText = answerText;
         }
 
+        // 처음 페이지 로드 시 색상 설정
+        setTargetColor();
         drawColorWheel();
         updateUserColor();
     </script>
