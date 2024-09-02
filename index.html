@@ -2,17 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HSL Color Matching Game with Color Wheel</title>
+    <title>HSL 색채 맞추기</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
         }
+        .color-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px auto;
+        }
         #targetColor, #userColor {
-            width: 100px;
-            height: 100px;
-            margin: 10px auto;
+            width: 120px;  /* 조금 더 크게 설정 */
+            height: 120px;
+            margin: 0 10px;
+            border: 2px solid #000;
         }
         .slider-container {
             display: flex;
@@ -40,12 +46,25 @@
             margin: 20px auto;
             cursor: crosshair;
         }
+        .button-container {
+            margin-top: 20px;
+        }
+        .button-container button {
+            display: block;
+            width: 150px;
+            margin: 10px auto;
+        }
     </style>
 </head>
 <body>
-    <h1>HSL Color Matching Game with Color Wheel</h1>
-    <div id="targetColor"></div>
-    <p>Match this color!</p>
+    <h1>HSL 색채 맞추기</h1>
+    
+    <div class="color-container">
+        <div id="targetColor"></div>
+        <div id="userColor"></div>
+    </div>
+    
+    <p>이 색을 맞춰봐!</p>
 
     <canvas id="colorWheel" width="300" height="300"></canvas>
     <div class="slider-container">
@@ -54,22 +73,23 @@
         <input type="number" id="hueNumber" class="number-input" min="0" max="360">
     </div>
     <div class="slider-container">
-        <label for="saturationSlider" class="slider-label">Saturation</label>
+        <label for="saturationSlider" class="slider-label">Sat.</label>
         <input type="range" id="saturationSlider" class="slider" min="0" max="100">
         <input type="number" id="saturationNumber" class="number-input" min="0" max="100">
     </div>
     <div class="slider-container">
-        <label for="lightnessSlider" class="slider-label">Lightness</label>
+        <label for="lightnessSlider" class="slider-label">Light.</label>
         <input type="range" id="lightnessSlider" class="slider" min="0" max="100">
         <input type="number" id="lightnessNumber" class="number-input" min="0" max="100">
     </div>
     <p class="info-text">Hue는 0-360의 범위 내에서 조정할 수 있습니다.<br>Saturation과 Lightness는 0-100 범위 내에서 조정할 수 있습니다.</p>
     
-    <div id="userColor"></div>
-    <p id="resultText"></p>
-    <button onclick="checkColor()">Check Color</button>
-    <button onclick="showAnswer()">Answer Sheet</button>
+    <div class="button-container">
+        <button onclick="checkColor()">Check Color</button>
+        <button onclick="showAnswer()">Answer Sheet</button>
+    </div>
     
+    <p id="resultText"></p>
     <p id="answerText"></p>
 
     <script>
@@ -100,7 +120,6 @@
                 ctx.fill();
             }
 
-            // 가운데의 작은 점을 표현
             ctx.beginPath();
             ctx.arc(radius, radius, 5, 0, Math.PI * 2, false);
             ctx.closePath();
@@ -148,8 +167,8 @@
 
             if (distance <= radius && distance >= 0) {
                 let angle = Math.atan2(dy, dx) * (180 / Math.PI); 
-                angle = (angle + 90) % 360; // 각도를 90도 보정하여 12시 방향을 0도로 설정
-                if (angle < 0) angle += 360; // 각도를 0-360도로 조정
+                angle = (angle + 90) % 360;
+                if (angle < 0) angle += 360; 
                 userColor.h = Math.round(angle);
                 userColor.s = Math.round((distance / radius) * 100);
 
@@ -170,12 +189,15 @@
 
             let totalDiff = Math.abs(hDiff) + Math.abs(sDiff) + Math.abs(lDiff);
 
-            let resultText = `Difference: Hue(${hDiff > 0 ? '+' + hDiff : hDiff}), Saturation(${sDiff > 0 ? '+' + sDiff : sDiff}), Lightness(${lDiff > 0 ? '+' + lDiff : lDiff})`;
+            let resultText;
 
             if (totalDiff === 0) {
-                resultText = "PERFECT!";
-            } else if (Math.abs(hDiff) <= 10 && Math.abs(sDiff) <= 10 && Math.abs(lDiff) <= 10) {
-                resultText = "GOOD!";
+                resultText = "PERFECT! 눈썰미가 아주 끝내주네요!";
+            } else {
+                resultText = `Difference: Hue(${hDiff > 0 ? '+' + hDiff : hDiff}), Saturation(${sDiff > 0 ? '+' + sDiff : sDiff}), Lightness(${lDiff > 0 ? '+' + lDiff : lDiff})`;
+                if (Math.abs(hDiff) <= 10 && Math.abs(sDiff) <= 10 && Math.abs(lDiff) <= 10) {
+                    resultText += " (GOOD! 잘했어요!)";
+                }
             }
             
             document.getElementById('resultText').innerText = resultText;
