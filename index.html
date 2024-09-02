@@ -13,11 +13,12 @@
             display: flex;
             justify-content: center;
             margin: 20px auto;
+            flex-wrap: wrap; /* 화면 크기에 따라 자동으로 요소 배치 */
         }
         #targetColor, #userColor {
-            width: 120px;
-            height: 120px;
-            margin: 0 10px;
+            width: 30vw;  /* 화면 너비의 30% */
+            height: 30vw; /* 화면 너비의 30% */
+            margin: 10px;
             border: 2px solid #000;
         }
         .slider-container {
@@ -25,6 +26,7 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 10px;
+            width: 100%; /* 전체 화면 너비에 맞춤 */
         }
         .slider-label {
             width: 70px;
@@ -32,10 +34,10 @@
             margin-right: 10px;
         }
         .slider {
-            width: 300px;
+            width: 70%; /* 슬라이더가 화면의 70%를 차지 */
         }
         .number-input {
-            width: 60px;
+            width: 20%; /* 숫자 입력 칸이 화면의 20%를 차지 */
             margin-left: 10px;
         }
         .info-text {
@@ -45,6 +47,8 @@
         #colorWheel {
             margin: 20px auto;
             cursor: crosshair;
+            width: 80vw;  /* 화면 너비의 80% */
+            height: 80vw; /* 화면 너비의 80% */
         }
         .button-container {
             margin-top: 20px;
@@ -66,7 +70,7 @@
     
     <p>이 색을 맞춰봐!</p>
 
-    <canvas id="colorWheel" width="300" height="300"></canvas>
+    <canvas id="colorWheel"></canvas>
     <div class="slider-container">
         <label for="hueSlider" class="slider-label">Hue</label>
         <input type="range" id="hueSlider" class="slider" min="0" max="360">
