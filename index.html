@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
     <title>HSL 색채 맞추기</title>
     <style>
         body {
@@ -20,7 +19,6 @@
             height: 120px;
             margin: 0 10px;
             border: 2px solid #000;
-            background-color: #fff;
         }
         .slider-container {
             display: flex;
@@ -40,7 +38,7 @@
             width: 60px;
             margin-left: 10px;
         }
-        .info-text, .result-text, .history-container {
+        .info-text {
             font-size: 0.9em;
             color: #666;
         }
@@ -55,6 +53,9 @@
             display: block;
             width: 150px;
             margin: 10px auto;
+        }
+        .history-container {
+            margin-top: 20px;
         }
         .history-container h2 {
             font-size: 1.2em;
@@ -72,14 +73,8 @@
             margin-bottom: 20px;
         }
         .explanation-text {
-            font-size: 0.8em;
+            font-size: 12px;
             color: #888;
-        }
-        .highlight-red {
-            color: #800000;
-        }
-        .highlight-blue {
-            color: #0047ab;
         }
     </style>
 </head>
@@ -124,8 +119,8 @@
         <button onclick="newColor()">새 게임</button>
     </div>
     
-    <p id="resultText" class="result-text"></p>
-    <p id="answerText" class="result-text"></p>
+    <p id="resultText"></p>
+    <p id="answerText"></p>
 
     <div class="history-container">
         <h2>결과 기록</h2>
@@ -156,15 +151,12 @@
             setTargetColor();
             document.getElementById('resultText').innerText = "";
             document.getElementById('answerText').innerText = "";
-            updateUserColor(); 
         }
 
         function drawColorWheel() {
             const canvas = document.getElementById('colorWheel');
             const ctx = canvas.getContext('2d');
             const radius = canvas.width / 2;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height); 
 
             for (let y = 0; y < canvas.height; y++) {
                 for (let x = 0; x < canvas.width; x++) {
@@ -174,11 +166,11 @@
 
                     if (distance <= radius) {
                         let angle = Math.atan2(dy, dx) * (180 / Math.PI);
-                        angle = (angle + 90) % 360;
-                        if (angle < 0) angle += 360;
+                        angle = (angle + 90) % 360;  // 90도를 더해 0도를 12시 방향으로 조정
+                        if (angle < 0) angle += 360;  // 음수 각도를 360도로 변환
 
                         const saturation = (distance / radius) * 100;
-                        const lightness = 50;
+                        const lightness = 50;  // 고정된 밝기
 
                         ctx.fillStyle = `hsl(${angle}, ${saturation}%, ${lightness}%)`;
                         ctx.fillRect(x, y, 1, 1);
@@ -267,9 +259,9 @@
                 historyText += `<span class="explanation-text">(현재 HSL: ${userColor.h}, ${userColor.s}%, ${userColor.l})</span>`;
             } else {
                 resultText = `차이값이 다음과 같습니다.<br><br>`;
-                resultText += `입력된 Hue값이 목표값보다 ${getDifferenceTextWithColor(targetColor.h - userColor.h)}.<br>`;
-                resultText += `입력된 Saturation값이 목표값보다 ${getDifferenceTextWithColor(targetColor.s - userColor.s)}.<br>`;
-                resultText += `입력된 Lightness값이 목표값보다 ${getDifferenceTextWithColor(targetColor.l - userColor.l)}.<br><br>`;
+                resultText += `입력된 Hue값이 목표값보다 ${getDifferenceText(targetColor.h - userColor.h)}.<br>`;
+                resultText += `입력된 Saturation값이 목표값보다 ${getDifferenceText(targetColor.s - userColor.s)}.<br>`;
+                resultText += `입력된 Lightness값이 목표값보다 ${getDifferenceText(targetColor.l - userColor.l)}.<br><br>`;
                 resultText += `<span class="explanation-text">*값이 '아주' 다르다면 30 이상으로 차이가 난다는 뜻입니다.<br>`;
                 resultText += `*값이 '조금' 다르다면 15 이하로 차이가 난다는 뜻입니다.<br>`;
                 resultText += `*값이 그냥 다르다면 16~29 정도로 차이가 난다는 뜻이겠죠?:D</span>`;
@@ -282,10 +274,10 @@
         
             // 기록 저장 (최대 10개로 제한)
             if (history.length >= 10) {
-                history.pop(); 
+                history.pop(); // 가장 오래된 기록 제거
             }
         
-            history.unshift(historyText); 
+            history.unshift(historyText); // 가장 최근 기록을 배열의 앞에 추가
             updateHistory();
         }
         
@@ -317,18 +309,9 @@
             if (Math.abs(diff) >= 30) {
                 return diff > 0 ? "낮음" : "높음";
             } else if (Math.abs(diff) <= 15) {
-                return "조금 " + (diff > 0 ? "낮음" : "높음";
+                return "조금 " + (diff > 0 ? "낮음" : "높음");
             } else {
                 return diff > 0 ? "낮음" : "높음";
-            }
-        }
-
-        function getDifferenceTextWithColor(diff) {
-            let text = getDifferenceText(diff);
-            if (text.includes("높습니다")) {
-                return `<span class="highlight-red">${text}</span>`;
-            } else {
-                return `<span class="highlight-blue">${text}</span>`;
             }
         }
 
