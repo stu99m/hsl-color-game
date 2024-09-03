@@ -19,6 +19,7 @@
             height: 120px;
             margin: 0 10px;
             border: 2px solid #000;
+            background-color: #fff; /* 기본 배경색을 추가합니다. */
         }
         .slider-container {
             display: flex;
@@ -154,12 +155,15 @@
             setTargetColor();
             document.getElementById('resultText').innerText = "";
             document.getElementById('answerText').innerText = "";
+            updateUserColor(); // 이 부분을 추가해서 새 게임 시작 시 사용자가 선택한 색상을 초기화합니다.
         }
 
         function drawColorWheel() {
             const canvas = document.getElementById('colorWheel');
             const ctx = canvas.getContext('2d');
             const radius = canvas.width / 2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // 이 부분에서 캔버스를 지우고 새로 그립니다.
 
             for (let y = 0; y < canvas.height; y++) {
                 for (let x = 0; x < canvas.width; x++) {
@@ -211,7 +215,7 @@
             const rect = canvas.getBoundingClientRect();
             const radius = canvas.width / 2;
             const dx = x - rect.left - radius;
-            const dy = y - radius - rect.top;
+            const dy = y - rect.top - radius;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
             if (distance <= radius && distance >= 0) {
