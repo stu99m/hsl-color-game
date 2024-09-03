@@ -38,7 +38,7 @@
             width: 60px;
             margin-left: 10px;
         }
-        .info-text {
+        .info-text, .result-text, .history-container {
             font-size: 0.9em;
             color: #666;
         }
@@ -53,9 +53,6 @@
             display: block;
             width: 150px;
             margin: 10px auto;
-        }
-        .history-container {
-            margin-top: 20px;
         }
         .history-container h2 {
             font-size: 1.2em;
@@ -73,8 +70,14 @@
             margin-bottom: 20px;
         }
         .explanation-text {
-            font-size: 12px;
+            font-size: 0.8em;
             color: #888;
+        }
+        .highlight-red {
+            color: #800000;
+        }
+        .highlight-blue {
+            color: #0047ab;
         }
     </style>
 </head>
@@ -119,8 +122,8 @@
         <button onclick="newColor()">새 게임</button>
     </div>
     
-    <p id="resultText"></p>
-    <p id="answerText"></p>
+    <p id="resultText" class="result-text"></p>
+    <p id="answerText" class="result-text"></p>
 
     <div class="history-container">
         <h2>결과 기록</h2>
@@ -208,7 +211,7 @@
             const rect = canvas.getBoundingClientRect();
             const radius = canvas.width / 2;
             const dx = x - rect.left - radius;
-            const dy = y - rect.top - radius;
+            const dy = y - radius - rect.top;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
             if (distance <= radius && distance >= 0) {
@@ -259,9 +262,9 @@
                 historyText += `<span class="explanation-text">(현재 HSL: ${userColor.h}, ${userColor.s}%, ${userColor.l})</span>`;
             } else {
                 resultText = `차이값이 다음과 같습니다.<br><br>`;
-                resultText += `입력된 Hue값이 목표값보다 ${getDifferenceText(targetColor.h - userColor.h)}.<br>`;
-                resultText += `입력된 Saturation값이 목표값보다 ${getDifferenceText(targetColor.s - userColor.s)}.<br>`;
-                resultText += `입력된 Lightness값이 목표값보다 ${getDifferenceText(targetColor.l - userColor.l)}.<br><br>`;
+                resultText += `입력된 Hue값이 목표값보다 ${getDifferenceTextWithColor(targetColor.h - userColor.h)}.<br>`;
+                resultText += `입력된 Saturation값이 목표값보다 ${getDifferenceTextWithColor(targetColor.s - userColor.s)}.<br>`;
+                resultText += `입력된 Lightness값이 목표값보다 ${getDifferenceTextWithColor(targetColor.l - userColor.l)}.<br><br>`;
                 resultText += `<span class="explanation-text">*값이 '아주' 다르다면 30 이상으로 차이가 난다는 뜻입니다.<br>`;
                 resultText += `*값이 '조금' 다르다면 15 이하로 차이가 난다는 뜻입니다.<br>`;
                 resultText += `*값이 그냥 다르다면 16~29 정도로 차이가 난다는 뜻이겠죠?:D</span>`;
@@ -309,9 +312,18 @@
             if (Math.abs(diff) >= 30) {
                 return diff > 0 ? "낮음" : "높음";
             } else if (Math.abs(diff) <= 15) {
-                return "조금 " + (diff > 0 ? "낮음" : "높음");
+                return "조금 " + (diff > 0 ? "낮음" : "높음";
             } else {
                 return diff > 0 ? "낮음" : "높음";
+            }
+        }
+
+        function getDifferenceTextWithColor(diff) {
+            let text = getDifferenceText(diff);
+            if (text.includes("높습니다")) {
+                return `<span class="highlight-red">${text}</span>`;
+            } else {
+                return `<span class="highlight-blue">${text}</span>`;
             }
         }
 
