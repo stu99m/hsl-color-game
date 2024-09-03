@@ -252,11 +252,11 @@
                     historyText = `★★세상에 마상에 완벽해요!★★<br>`;
                 } else {
                     resultText = `★잘했어요!★<br>`;
-                    resultText += `주어진 HSL: (${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)<br>`;
-                    resultText += `당신이 고른 HSL: (${userColor.h}, ${userColor.s}%, ${userColor.l}%)`;
+                    resultText += `주어진 HSL: (${targetColor.h}, ${targetColor.s}%, ${targetColor.l})<br>`;
+                    resultText += `당신이 고른 HSL: (${userColor.h}, ${userColor.s}%, ${userColor.l})`;
                     historyText = `★잘했어요!★<br>`;
                 }
-                historyText += `<span class="explanation-text">(현재 HSL: ${userColor.h}, ${userColor.s}%, ${userColor.l}%)</span>`;
+                historyText += `<span class="explanation-text">(현재 HSL: ${userColor.h}, ${userColor.s}%, ${userColor.l})</span>`;
             } else {
                 resultText = `차이값이 다음과 같습니다.<br><br>`;
                 resultText += `입력된 Hue값이 목표값보다 ${getDifferenceText(targetColor.h - userColor.h)}.<br>`;
@@ -267,7 +267,7 @@
                 resultText += `*값이 그냥 다르다면 16~29 정도로 차이가 난다는 뜻이겠죠?:D</span>`;
                 
                 historyText = `Hue ${getSimpleDifferenceText(targetColor.h - userColor.h)}, Saturation ${getSimpleDifferenceText(targetColor.s - userColor.s)}, Lightness ${getSimpleDifferenceText(targetColor.l - userColor.l)}.<br>`;
-                historyText += `<span class="explanation-text">(현재 HSL: ${userColor.h}, ${userColor.s}%, ${userColor.l}%)</span>`;
+                historyText += `<span class="explanation-text">(현재 HSL: ${userColor.h}, ${userColor.s}%, ${userColor.l})</span>`;
             }
         
             document.getElementById('resultText').innerHTML = resultText;
@@ -295,8 +295,6 @@
             });
         }
 
-
-
         function getDifferenceText(diff) {
             if (Math.abs(diff) >= 30) {
                 return "아주 " + (diff > 0 ? "낮습니다" : "높습니다");
@@ -315,16 +313,6 @@
             } else {
                 return diff > 0 ? "낮음" : "높음";
             }
-        }
-
-        function updateHistory() {
-            const historyList = document.getElementById('historyList');
-            historyList.innerHTML = '';
-            history.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.innerHTML = `${index + 1}: ${item}`;
-                historyList.appendChild(li);
-            });
         }
 
         function showAnswer() {
