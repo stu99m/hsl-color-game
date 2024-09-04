@@ -93,35 +93,6 @@
             color: #888;
         }
 
-        /* 반응형 폰트 크기 설정 */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.5em;
-            }
-
-            .explanation-text {
-                font-size: 0.75em;
-            }
-
-            .history-container h2 {
-                font-size: 1.1em;
-            }
-        }
-
-        @media (min-width: 769px) {
-            h1 {
-                font-size: 2em;
-            }
-
-            .explanation-text {
-                font-size: 0.9em;
-            }
-
-            .history-container h2 {
-                font-size: 1.3em;
-            }
-        }
-
         .highlight {
             font-weight: bold;
         }
@@ -177,7 +148,7 @@
 
     <div class="button-container">
         <button onclick="checkColor()">색상 확인</button>
-        <button onclick="showAnswer()">답안지</button>
+        <button id="answerButton" onclick="toggleAnswer()">답안지</button>
         <button onclick="newColor()">새 게임</button>
     </div>
 
@@ -196,9 +167,10 @@
             l: Math.floor(Math.random() * 101)
         };
 
-        let userColor = { h: 0, s: 100, l: 50 };
+        let userColor = { h: 180, s: 50, l: 50 }; // 초기값을 각 범위의 중간값으로 설정
         let isDragging = false;
         let history = [];
+        let showAnswer = false; // 답안지 토글 상태
 
         function setTargetColor() {
             document.getElementById('targetColor').style.backgroundColor = `hsl(${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)`;
@@ -213,6 +185,7 @@
             setTargetColor();
             document.getElementById('resultText').innerText = "";
             document.getElementById('answerText').style.display = "none";
+            document.getElementById('answerButton').innerText = "답안지";
             updateUserColor();
         }
 
@@ -247,11 +220,6 @@
             userColor.s = document.getElementById('saturationSlider').value;
             userColor.l = document.getElementById('lightnessSlider').value;
             document.getElementById('userColor').style.backgroundColor = `hsl(${userColor.h}, ${userColor.s}%, ${userColor.l}%)`;
-
-            // Only draw the color wheel once on page load, not every time user color changes
-            if (!isDragging) {
-                drawColorWheel();
-            }
         }
 
         function syncSlidersAndNumbers(sliderId, numberId) {
@@ -267,31 +235,6 @@
                 slider.value = numberInput.value;
                 updateUserColor();
             });
-        }
-
-        function updateColorFromWheel(x, y) {
-            const canvas = document.getElementById('colorWheel');
-            const rect = canvas.getBoundingClientRect();
-            const radius = canvas.width / 2;
-            const dx = x - rect.left - radius;
-            const dy = y - rect.top - radius;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance <= radius && distance >= 0) {
-                let angle = Math.atan2(dy, dx) * (180 / Math.PI);
-                angle = (angle + 90) % 360;
-                if (angle < 0) angle += 360;
-                userColor.h = Math.round(angle);
-                userColor.s = Math.round((distance / radius) * 100);
-
-                document.getElementById('hueSlider').value = userColor.h;
-                document.getElementById('saturationSlider').value = userColor.s;
-
-                document.getElementById('hueNumber').value = userColor.h;
-                document.getElementById('saturationNumber').value = userColor.s;
-
-                updateUserColor();
-            }
         }
 
         function checkColor() {
@@ -356,6 +299,22 @@
             });
         }
 
+        function toggleAnswer() {
+            let answerText = document.getElementById('answerText');
+            let answerButton = document.getElementById('answerButton');
+
+            if (showAnswer) {
+                answerText.style.display = "none";
+                answerButton.innerText = "답안지";
+            } else {
+                answerText.innerHTML = `주어진 HSL: (${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)<br>당신이 고른 HSL: (${userColor.h}, ${userColor.s}%, ${userColor.l})`;
+                answerText.style.display = "block";
+                answerButton.innerText = "답안지 숨기기";
+            }
+
+            showAnswer = !showAnswer;
+        }
+
         function getDifferenceText(diff) {
             if (Math.abs(diff) >= 30) {
                 return "아주 " + (diff > 0 ? "낮습니다" : "높습니다");
@@ -374,12 +333,6 @@
             } else {
                 return diff > 0 ? "낮음" : "높음";
             }
-        }
-
-        function showAnswer() {
-            let answerText = `주어진 HSL: (${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)<br>당신이 고른 HSL: (${userColor.h}, ${userColor.s}%, ${userColor.l})`;
-            document.getElementById('answerText').innerHTML = answerText;
-            document.getElementById('answerText').style.display = "block";
         }
 
         syncSlidersAndNumbers('hueSlider', 'hueNumber');
@@ -424,10 +377,9 @@
             isDragging = false;
         });
 
-        // 처음 페이지 로드 시 색상 설정
+        // 처음 페이지 로드 시 색상 설정 및 초기 사용자 색상 값 설정
         setTargetColor();
-        drawColorWheel();
-        updateUserColor();
+        updateUserColor(); 
     </script>
 </body>
 </html>
