@@ -186,6 +186,15 @@
             document.getElementById('resultText').innerText = "";
             document.getElementById('answerText').style.display = "none";
             document.getElementById('answerButton').innerText = "답안지";
+
+            userColor = { h: 180, s: 50, l: 50 }; // 초기값 설정
+            document.getElementById('hueSlider').value = userColor.h;
+            document.getElementById('saturationSlider').value = userColor.s;
+            document.getElementById('lightnessSlider').value = userColor.l;
+            document.getElementById('hueNumber').value = userColor.h;
+            document.getElementById('saturationNumber').value = userColor.s;
+            document.getElementById('lightnessNumber').value = userColor.l;
+
             updateUserColor();
         }
 
@@ -218,9 +227,18 @@
         }
 
         function updateUserColor() {
-            userColor.h = document.getElementById('hueSlider').value;
-            userColor.s = document.getElementById('saturationSlider').value;
-            userColor.l = document.getElementById('lightnessSlider').value;
+            const hueSlider = document.getElementById('hueSlider');
+            const saturationSlider = document.getElementById('saturationSlider');
+            const lightnessSlider = document.getElementById('lightnessSlider');
+
+            userColor.h = hueSlider.value;
+            userColor.s = saturationSlider.value;
+            userColor.l = lightnessSlider.value;
+
+            document.getElementById('hueNumber').value = hueSlider.value;
+            document.getElementById('saturationNumber').value = saturationSlider.value;
+            document.getElementById('lightnessNumber').value = lightnessSlider.value;
+
             document.getElementById('userColor').style.backgroundColor = `hsl(${userColor.h}, ${userColor.s}%, ${userColor.l}%)`;
         }
 
@@ -228,13 +246,20 @@
             let slider = document.getElementById(sliderId);
             let numberInput = document.getElementById(numberId);
 
-            slider.addEventListener('input', function() {
+            slider.addEventListener('input', function () {
                 numberInput.value = slider.value;
                 updateUserColor();
             });
 
-            numberInput.addEventListener('input', function() {
-                slider.value = numberInput.value;
+            numberInput.addEventListener('input', function () {
+                let value = Number(numberInput.value);
+                if (isNaN(value)) {
+                    value = 0; // 기본값 설정
+                }
+                // 슬라이더의 범위 내로 제한
+                value = Math.max(Number(slider.min), Math.min(Number(slider.max), value));
+                numberInput.value = value;
+                slider.value = value;
                 updateUserColor();
             });
         }
@@ -263,8 +288,8 @@
                     historyText = `★★세상에 마상에 완벽해요!★★`;
                 } else {
                     resultText = `★잘했어요!★<br>`;
-                    resultText += `주어진 HSL: (${targetColor.h}, ${targetColor.s}%, ${targetColor.l})<br>`;
-                    resultText += `당신이 고른 HSL: (${userColor.h}, ${userColor.s}%, ${userColor.l})`;
+                    resultText += `주어진 HSL: (${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)<br>`;
+                    resultText += `당신이 고른 HSL: (${userColor.h}, ${userColor.s}%, ${userColor.l}%)`;
                     historyText = `★잘했어요!★`;
                 }
             } else {
@@ -309,7 +334,7 @@
                 answerText.style.display = "none";
                 answerButton.innerText = "답안지";
             } else {
-                answerText.innerHTML = `주어진 HSL: (${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)<br>당신이 고른 HSL: (${userColor.h}, ${userColor.s}%, ${userColor.l})`;
+                answerText.innerHTML = `주어진 HSL: (${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)<br>당신이 고른 HSL: (${userColor.h}, ${userColor.s}%, ${userColor.l}%)`;
                 answerText.style.display = "block";
                 answerButton.innerText = "답안지 숨기기";
             }
@@ -379,10 +404,47 @@
             isDragging = false;
         });
 
+        function updateColorFromWheel(clientX, clientY) {
+            const canvas = document.getElementById('colorWheel');
+            const rect = canvas.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            const radius = canvas.width / 2;
+            const dx = x - radius;
+            const dy = y - radius;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance <= radius) {
+                let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                angle = (angle + 90) % 360;
+                if (angle < 0) angle += 360;
+
+                const saturation = (distance / radius) * 100;
+
+                // 값을 슬라이더와 입력 박스에 동기화
+                document.getElementById('hueSlider').value = Math.round(angle);
+                document.getElementById('saturationSlider').value = Math.round(saturation);
+
+                document.getElementById('hueNumber').value = Math.round(angle);
+                document.getElementById('saturationNumber').value = Math.round(saturation);
+
+                updateUserColor();
+            }
+        }
+
         // 처음 페이지 로드 시 색상 설정 및 초기 사용자 색상 값 설정
+        document.getElementById('hueSlider').value = userColor.h;
+        document.getElementById('saturationSlider').value = userColor.s;
+        document.getElementById('lightnessSlider').value = userColor.l;
+        document.getElementById('hueNumber').value = userColor.h;
+        document.getElementById('saturationNumber').value = userColor.s;
+        document.getElementById('lightnessNumber').value = userColor.l;
+
         setTargetColor();
         drawColorWheel();  // 페이지가 로드될 때 색상환을 그리도록 호출
         updateUserColor(); 
+
     </script>
 </body>
 </html>
