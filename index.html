@@ -8,6 +8,7 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
+            font-size: 16px; /* 기본 폰트 크기 설정 */
         }
 
         .color-container {
@@ -105,6 +106,30 @@
             color: blue;
         }
 
+        /* 미디어 쿼리로 모바일 화면 크기 조정 */
+        @media (max-width: 600px) {
+            body {
+                font-size: 14px; /* 폰트 크기 축소 */
+            }
+
+            #targetColor, #userColor {
+                width: 80px;
+                height: 80px;
+            }
+
+            .slider {
+                width: 200px; /* 슬라이더 크기 축소 */
+            }
+
+            .button-container button {
+                width: 120px; /* 버튼 크기 축소 */
+            }
+
+            #colorWheel {
+                width: 200px;
+                height: 200px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -144,7 +169,7 @@
         <input type="number" id="lightnessNumber" class="number-input" min="0" max="100">
     </div>
 
-    <p class="info-text">Hue는 0-360의 범위 내에서 조정할 수 있습니다.<br>Saturation과 Lightness는 0-100 범위 내에서 조정할 수 있습니다.<br><br>HSL 색채계에서는 Lightness의 값이 0일 때 검은색, 100일 때 흰색입니다.<br>(Lightness가 50일 때는 회색이에요!)</p>
+    <p class="info-text">Hue는 0-360의 범위 내에서 조정할 수 있습니다.<br>Saturation과 Lightness는 0-100 범위 내에서 조정할 수 있습니다.</p>
 
     <div class="button-container">
         <button onclick="checkColor()">색상 확인</button>
@@ -167,10 +192,10 @@
             l: Math.floor(Math.random() * 101)
         };
 
-        let userColor = { h: 180, s: 50, l: 50 }; // 초기값을 각 범위의 중간값으로 설정
+        let userColor = { h: 180, s: 50, l: 50 };
         let isDragging = false;
         let history = [];
-        let showAnswer = false; // 답안지 토글 상태
+        let showAnswer = false;
 
         function setTargetColor() {
             document.getElementById('targetColor').style.backgroundColor = `hsl(${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)`;
@@ -187,7 +212,7 @@
             document.getElementById('answerText').style.display = "none";
             document.getElementById('answerButton').innerText = "답안지";
 
-            userColor = { h: 180, s: 50, l: 50 }; // 초기값 설정
+            userColor = { h: 180, s: 50, l: 50 };
             document.getElementById('hueSlider').value = userColor.h;
             document.getElementById('saturationSlider').value = userColor.s;
             document.getElementById('lightnessSlider').value = userColor.l;
@@ -196,34 +221,6 @@
             document.getElementById('lightnessNumber').value = userColor.l;
 
             updateUserColor();
-        }
-
-        function drawColorWheel() {
-            const canvas = document.getElementById('colorWheel');
-            const ctx = canvas.getContext('2d');
-            const radius = canvas.width / 2;
-
-            if (ctx) {
-                for (let y = 0; y < canvas.height; y++) {
-                    for (let x = 0; x < canvas.width; x++) {
-                        const dx = x - radius;
-                        const dy = y - radius;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-
-                        if (distance <= radius) {
-                            let angle = Math.atan2(dy, dx) * (180 / Math.PI);
-                            angle = (angle + 90) % 360;
-                            if (angle < 0) angle += 360;
-
-                            const saturation = (distance / radius) * 100;
-                            const lightness = 50;
-
-                            ctx.fillStyle = `hsl(${angle}, ${saturation}%, ${lightness}%)`;
-                            ctx.fillRect(x, y, 1, 1);
-                        }
-                    }
-                }
-            }
         }
 
         function updateUserColor() {
@@ -254,9 +251,8 @@
             numberInput.addEventListener('input', function () {
                 let value = Number(numberInput.value);
                 if (isNaN(value)) {
-                    value = 0; // 기본값 설정
+                    value = 0;
                 }
-                // 슬라이더의 범위 내로 제한
                 value = Math.max(Number(slider.min), Math.min(Number(slider.max), value));
                 numberInput.value = value;
                 slider.value = value;
@@ -303,12 +299,11 @@
 
             document.getElementById('resultText').innerHTML = resultText;
 
-            // 기록 저장 (최대 10개로 제한)
             if (history.length >= 10) {
-                history.pop(); // 가장 오래된 기록 제거
+                history.pop();
             }
 
-            history.unshift(historyText); // 가장 최근 기록을 배열의 앞에 추가
+            history.unshift(historyText);
             updateHistory();
         }
 
@@ -356,7 +351,7 @@
             if (Math.abs(diff) >= 30) {
                 return diff > 0 ? "낮음" : "높음";
             } else if (Math.abs(diff) <= 15) {
-                return "조금 " + (diff > 0 ? "낮음" : "높음");
+                return "조금 " + (diff > 0 ? "낮음" : "높음";
             } else {
                 return diff > 0 ? "낮음" : "높음";
             }
@@ -366,85 +361,8 @@
         syncSlidersAndNumbers('saturationSlider', 'saturationNumber');
         syncSlidersAndNumbers('lightnessSlider', 'lightnessNumber');
 
-        const canvas = document.getElementById('colorWheel');
-
-        canvas.addEventListener('mousedown', function(event) {
-            isDragging = true;
-            updateColorFromWheel(event.clientX, event.clientY);
-        });
-
-        canvas.addEventListener('mousemove', function(event) {
-            if (isDragging) {
-                updateColorFromWheel(event.clientX, event.clientY);
-            }
-        });
-
-        canvas.addEventListener('mouseup', function() {
-            isDragging = false;
-        });
-
-        canvas.addEventListener('mouseleave', function() {
-            isDragging = false;
-        });
-
-        canvas.addEventListener('touchstart', function(event) {
-            isDragging = true;
-            const touch = event.touches[0];
-            updateColorFromWheel(touch.clientX, touch.clientY);
-        });
-
-        canvas.addEventListener('touchmove', function(event) {
-            if (isDragging) {
-                const touch = event.touches[0];
-                updateColorFromWheel(touch.clientX, touch.clientY);
-            }
-        });
-
-        canvas.addEventListener('touchend', function() {
-            isDragging = false;
-        });
-
-        function updateColorFromWheel(clientX, clientY) {
-            const canvas = document.getElementById('colorWheel');
-            const rect = canvas.getBoundingClientRect();
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-
-            const radius = canvas.width / 2;
-            const dx = x - radius;
-            const dy = y - radius;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance <= radius) {
-                let angle = Math.atan2(dy, dx) * (180 / Math.PI);
-                angle = (angle + 90) % 360;
-                if (angle < 0) angle += 360;
-
-                const saturation = (distance / radius) * 100;
-
-                // 값을 슬라이더와 입력 박스에 동기화
-                document.getElementById('hueSlider').value = Math.round(angle);
-                document.getElementById('saturationSlider').value = Math.round(saturation);
-
-                document.getElementById('hueNumber').value = Math.round(angle);
-                document.getElementById('saturationNumber').value = Math.round(saturation);
-
-                updateUserColor();
-            }
-        }
-
-        // 처음 페이지 로드 시 색상 설정 및 초기 사용자 색상 값 설정
-        document.getElementById('hueSlider').value = userColor.h;
-        document.getElementById('saturationSlider').value = userColor.s;
-        document.getElementById('lightnessSlider').value = userColor.l;
-        document.getElementById('hueNumber').value = userColor.h;
-        document.getElementById('saturationNumber').value = userColor.s;
-        document.getElementById('lightnessNumber').value = userColor.l;
-
         setTargetColor();
-        drawColorWheel();  // 페이지가 로드될 때 색상환을 그리도록 호출
-        updateUserColor(); 
-
+        updateUserColor();
     </script>
 </body>
 </html>
