@@ -8,7 +8,7 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
-            font-size: 16px; /* 기본 폰트 크기 설정 */
+            font-size: 16px;
         }
 
         .color-container {
@@ -109,7 +109,7 @@
         /* 미디어 쿼리로 모바일 화면 크기 조정 */
         @media (max-width: 600px) {
             body {
-                font-size: 14px; /* 폰트 크기 축소 */
+                font-size: 14px;
             }
 
             #targetColor, #userColor {
@@ -118,11 +118,11 @@
             }
 
             .slider {
-                width: 200px; /* 슬라이더 크기 축소 */
+                width: 200px;
             }
 
             .button-container button {
-                width: 120px; /* 버튼 크기 축소 */
+                width: 120px;
             }
 
             #colorWheel {
@@ -232,10 +232,6 @@
             userColor.s = saturationSlider.value;
             userColor.l = lightnessSlider.value;
 
-            document.getElementById('hueNumber').value = hueSlider.value;
-            document.getElementById('saturationNumber').value = saturationSlider.value;
-            document.getElementById('lightnessNumber').value = lightnessSlider.value;
-
             document.getElementById('userColor').style.backgroundColor = `hsl(${userColor.h}, ${userColor.s}%, ${userColor.l}%)`;
         }
 
@@ -307,20 +303,19 @@
             updateHistory();
         }
 
-function updateHistory() {
-    const historyList = document.getElementById('historyList');
-    historyList.innerHTML = '<span class="explanation-text">(결과는 10개까지 기록되고 오래된 기록은 삭제됩니다.)</span><br><br>';
-    history.forEach((item, index) => {
-        const li = document.createElement('li');
-        if (index === 0) {
-            li.innerHTML = `${index + 1}: ${item} <span style="color: red;">←new!</span><br><span class="explanation-text">(현재 HSL: ${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)</span>`;
-        } else {
-            li.innerHTML = `${index + 1}: ${item}<br><span class="explanation-text">(현재 HSL: ${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)</span>`;
+        function updateHistory() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '<span class="explanation-text">(결과는 10개까지 기록되고 오래된 기록은 삭제됩니다.)</span><br><br>';
+            history.forEach((item, index) => {
+                const li = document.createElement('li');
+                if (index === 0) {
+                    li.innerHTML = `${index + 1}: ${item} <span style="color: red;">←new!</span><br><span class="explanation-text">(현재 HSL: ${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)</span>`;
+                } else {
+                    li.innerHTML = `${index + 1}: ${item}<br><span class="explanation-text">(현재 HSL: ${targetColor.h}, ${targetColor.s}%, ${targetColor.l}%)</span>`;
+                }
+                historyList.appendChild(li);
+            });
         }
-        historyList.appendChild(li);
-    });
-}
-
 
         function toggleAnswer() {
             let answerText = document.getElementById('answerText');
@@ -352,7 +347,7 @@ function updateHistory() {
             if (Math.abs(diff) >= 30) {
                 return diff > 0 ? "낮음" : "높음";
             } else if (Math.abs(diff) <= 15) {
-                return "조금 " + (diff > 0 ? "낮음" : "높음";
+                return "조금 " + (diff > 0 ? "낮음" : "높음");
             } else {
                 return diff > 0 ? "낮음" : "높음";
             }
@@ -362,7 +357,37 @@ function updateHistory() {
         syncSlidersAndNumbers('saturationSlider', 'saturationNumber');
         syncSlidersAndNumbers('lightnessSlider', 'lightnessNumber');
 
+        // 색상환 그리기 함수
+        function drawColorWheel() {
+            const canvas = document.getElementById('colorWheel');
+            const ctx = canvas.getContext('2d');
+            const radius = canvas.width / 2;
+
+            if (ctx) {
+                for (let y = 0; y < canvas.height; y++) {
+                    for (let x = 0; x < canvas.width; x++) {
+                        const dx = x - radius;
+                        const dy = y - radius;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance <= radius) {
+                            let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                            angle = (angle + 90) % 360;
+                            if (angle < 0) angle += 360;
+
+                            const saturation = (distance / radius) * 100;
+                            const lightness = 50;
+
+                            ctx.fillStyle = `hsl(${angle}, ${saturation}%, ${lightness}%)`;
+                            ctx.fillRect(x, y, 1, 1);
+                        }
+                    }
+                }
+            }
+        }
+
         setTargetColor();
+        drawColorWheel(); // 페이지가 로드될 때 색상환을 그리도록 호출
         updateUserColor();
     </script>
 </body>
