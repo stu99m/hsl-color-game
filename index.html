@@ -20,7 +20,7 @@
         #targetColor, #userColor {
             width: 120px;
             height: 120px;
-            margin: 0; /* 여백 제거 */
+            margin: 0;
         }
 
         .slider-container {
@@ -75,7 +75,7 @@
         }
 
         .history-list {
-            list-style-type: none; /* 리스트 앞 점 제거 */
+            list-style-type: none;
             padding: 0;
         }
 
@@ -89,7 +89,7 @@
         }
 
         .explanation-text {
-            font-size: 0.9em; /* 안내문 크기와 동일하게 */
+            font-size: 0.9em;
             color: #888;
         }
 
@@ -105,7 +105,6 @@
             color: blue;
         }
 
-        /* 미디어 쿼리로 모바일 화면 크기 조정 */
         @media (max-width: 600px) {
             body {
                 font-size: 14px;
@@ -184,7 +183,6 @@
         <span class="explanation-text">(결과는 10개까지 기록되고 오래된 기록은 삭제됩니다.)</span><br><br>
     </ul>
 
-
     <script>
         let targetColor = {
             h: Math.floor(Math.random() * 361),
@@ -259,75 +257,25 @@
             });
         }
 
-        // 색상환 드래그로 업데이트하는 함수
-        function updateColorFromWheel(clientX, clientY) {
-            const canvas = document.getElementById('colorWheel');
-            const rect = canvas.getBoundingClientRect();
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-
-            const radius = canvas.width / 2;
-            const dx = x - radius;
-            const dy = y - radius;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance <= radius) {
-                let angle = Math.atan2(dy, dx) * (180 / Math.PI);
-                angle = (angle + 90) % 360;
-                if (angle < 0) angle += 360;
-
-                const saturation = (distance / radius) * 100;
-
-                document.getElementById('hueSlider').value = Math.round(angle);
-                document.getElementById('saturationSlider').value = Math.round(saturation);
-
-                document.getElementById('hueNumber').value = Math.round(angle);
-                document.getElementById('saturationNumber').value = Math.round(saturation);
-
-                updateUserColor();
+        function getDifferenceText(diff, type) {
+            if (diff === 0) {
+                return `입력한 ${type}값이 목표값과 같습니다.`;
+            } else {
+                let diffText = diff > 0 ? "낮습니다" : "높습니다";
+                let color = diff > 0 ? 'blue' : 'red';
+                return `입력한 ${type}값이 목표값보다 <span style="color:${color};">${Math.abs(diff) >= 30 ? '아주 ' : (Math.abs(diff) <= 15 ? '조금 ' : '')}${diffText}</span>.`;
             }
         }
 
-        // 색상환 드래그 이벤트 설정
-        const canvas = document.getElementById('colorWheel');
-        let isDragging = false;
-
-        canvas.addEventListener('mousedown', function(event) {
-            isDragging = true;
-            updateColorFromWheel(event.clientX, event.clientY);
-        });
-
-        canvas.addEventListener('mousemove', function(event) {
-            if (isDragging) {
-                updateColorFromWheel(event.clientX, event.clientY);
+        function getSimpleDifferenceText(diff) {
+            if (diff === 0) {
+                return "같음";
+            } else {
+                let diffText = diff > 0 ? "낮음" : "높음";
+                let prefix = Math.abs(diff) >= 30 ? '아주 ' : (Math.abs(diff) <= 15 ? '조금 ' : '');
+                return prefix + diffText;
             }
-        });
-
-        canvas.addEventListener('mouseup', function() {
-            isDragging = false;
-        });
-
-        canvas.addEventListener('mouseleave', function() {
-            isDragging = false;
-        });
-
-        // 터치 이벤트도 추가
-        canvas.addEventListener('touchstart', function(event) {
-            isDragging = true;
-            const touch = event.touches[0];
-            updateColorFromWheel(touch.clientX, touch.clientY);
-        });
-
-        canvas.addEventListener('touchmove', function(event) {
-            if (isDragging) {
-                const touch = event.touches[0];
-                updateColorFromWheel(touch.clientX, touch.clientY);
-            }
-        });
-
-        canvas.addEventListener('touchend', function() {
-            isDragging = false;
-        });
+        }
 
         function checkColor() {
             let difficulty = document.getElementById('difficulty').value;
@@ -358,10 +306,14 @@
                     historyText = `★잘했어요!★`;
                 }
             } else {
-                resultText = `조금 더 고민해봅시다.<br><br>`;
-                resultText += `<span class="highlight">Hue</span>값이 목표값보다 <span class="${targetColor.h - userColor.h > 0 ? 'low-value' : 'high-value'}">${getDifferenceText(targetColor.h - userColor.h)}</span>.<br>`;
-                resultText += `<span class="highlight">Saturation</span>값이 목표값보다 <span class="${targetColor.s - userColor.s > 0 ? 'low-value' : 'high-value'}">${getDifferenceText(targetColor.s - userColor.s)}</span>.<br>`;
-                resultText += `<span class="highlight">Lightness</span>값이 목표값보다 <span class="${targetColor.l - userColor.l > 0 ? 'low-value' : 'high-value'}">${getDifferenceText(targetColor.l - userColor.l)}</span>.<br>`;
+                // Hue 일치 여부
+                resultText += getDifferenceText(targetColor.h - userColor.h, "Hue") + "<br>";
+
+                // Saturation 일치 여부
+                resultText += getDifferenceText(targetColor.s - userColor.s, "Saturation") + "<br>";
+
+                // Lightness 일치 여부
+                resultText += getDifferenceText(targetColor.l - userColor.l, "Lightness") + "<br>";
 
                 historyText = `Hue ${getSimpleDifferenceText(targetColor.h - userColor.h)}, Saturation ${getSimpleDifferenceText(targetColor.s - userColor.s)}, Lightness ${getSimpleDifferenceText(targetColor.l - userColor.l)}.`;
             }
@@ -406,30 +358,6 @@
             showAnswer = !showAnswer;
         }
 
-        function getDifferenceText(diff) {
-            if (Math.abs(diff) >= 30) {
-                return "아주 " + (diff > 0 ? "낮습니다" : "높습니다");
-            } else if (Math.abs(diff) <= 15) {
-                return "조금 " + (diff > 0 ? "낮습니다" : "높습니다");
-            } else {
-                return diff > 0 ? "낮습니다" : "높습니다";
-            }
-        }
-
-        function getSimpleDifferenceText(diff) {
-            if (Math.abs(diff) >= 30) {
-                return diff > 0 ? "낮음" : "높음";
-            } else if (Math.abs(diff) <= 15) {
-                return "조금 " + (diff > 0 ? "낮음" : "높음");
-            } else {
-                return diff > 0 ? "낮음" : "높음";
-            }
-        }
-
-        syncSlidersAndNumbers('hueSlider', 'hueNumber');
-        syncSlidersAndNumbers('saturationSlider', 'saturationNumber');
-        syncSlidersAndNumbers('lightnessSlider', 'lightnessNumber');
-
         function drawColorWheel() {
             const canvas = document.getElementById('colorWheel');
             const ctx = canvas.getContext('2d');
@@ -461,6 +389,9 @@
         setTargetColor();
         drawColorWheel(); // 페이지가 로드될 때 색상환을 그리도록 호출
         updateUserColor();
+        syncSlidersAndNumbers('hueSlider', 'hueNumber');
+        syncSlidersAndNumbers('saturationSlider', 'saturationNumber');
+        syncSlidersAndNumbers('lightnessSlider', 'lightnessNumber');
     </script>
 </body>
 </html>
