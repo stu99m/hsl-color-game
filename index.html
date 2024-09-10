@@ -259,11 +259,12 @@
 
         function getDifferenceText(diff, type) {
             if (diff === 0) {
-                return `입력한 ${type}값이 목표값과 같습니다.`;
+                // 값이 같을 때
+                return `<span class="highlight">${type}</span>값이 목표값과 같습니다.`;
             } else {
                 let diffText = diff > 0 ? "낮습니다" : "높습니다";
                 let color = diff > 0 ? 'blue' : 'red';
-                return `입력한 ${type}값이 목표값보다 <span style="color:${color};">${Math.abs(diff) >= 30 ? '아주 ' : (Math.abs(diff) <= 15 ? '조금 ' : '')}${diffText}</span>.`;
+                return `<span class="highlight">${type}</span>값이 목표값보다 <span style="color:${color};">${Math.abs(diff) >= 30 ? '아주 ' : (Math.abs(diff) <= 15 ? '조금 ' : '')}${diffText}</span>.`;
             }
         }
 
@@ -306,13 +307,9 @@
                     historyText = `★잘했어요!★`;
                 }
             } else {
-                // Hue 일치 여부
+                // Hue, Saturation, Lightness 각각에 대해 차이 계산 및 문구 생성
                 resultText += getDifferenceText(targetColor.h - userColor.h, "Hue") + "<br>";
-
-                // Saturation 일치 여부
                 resultText += getDifferenceText(targetColor.s - userColor.s, "Saturation") + "<br>";
-
-                // Lightness 일치 여부
                 resultText += getDifferenceText(targetColor.l - userColor.l, "Lightness") + "<br>";
 
                 historyText = `Hue ${getSimpleDifferenceText(targetColor.h - userColor.h)}, Saturation ${getSimpleDifferenceText(targetColor.s - userColor.s)}, Lightness ${getSimpleDifferenceText(targetColor.l - userColor.l)}.`;
